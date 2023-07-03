@@ -21,12 +21,12 @@ sequenceDiagram
     
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
     activate server
-    server-->>browser: Haetaan CSS-tiedosto
+    server-->>browser: CSS-tiedosto
     deactivate server
     
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
     activate server
-    server-->>browser: Haetaan JavaScript-tiedosto
+    server-->>browser: JavaScript-tiedosto
     deactivate server
     
     Note right of browser: Selain suorittaa JavaScript-tiedoston ja hakee muistiinpanot JSON-muodossa palvelimelta

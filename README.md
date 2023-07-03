@@ -1,3 +1,3 @@
 # Full Stack Open
 
-Kurssin Full Stack Open tehtävien palautusrepositorio.
+Kurssin [Full Stack Open](https://fullstackopen.com/) tehtävien palautusrepositorio.

@@ -24,6 +24,16 @@
       "name": "Johnny Silverhand",
       "number": "2077",
       "id": 5
+    },
+    {
+      "name": "Rogue Amendiares",
+      "number": "12-34-2077",
+      "id": 6
+    },
+    {
+      "name": "Judy Alvarez",
+      "number": "43-21-2077",
+      "id": 7
     }
   ]
 }

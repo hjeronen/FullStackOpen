@@ -1,3 +1,3 @@
-# Full Stack osa 1
+# Full Stack osa 2
 
-Kurssin osan 1 tehtävät 1.1-1.5.
+Kurssin osan 2 tehtävät 2.1-2.5.

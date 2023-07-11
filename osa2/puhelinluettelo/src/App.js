@@ -10,7 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setNewFilter] = useState('')
-  const [notification, setNotification] = useState(null)
+  const [notification, setNotification] = useState({type: '', message: null})
 
   useEffect(() => {
     personService
@@ -24,10 +24,10 @@ const App = () => {
     person.name.toLowerCase().includes(filter.toLowerCase())
   )
 
-  const showNotification = (message) => {
-    setNotification(message)
+  const showNotification = (type, message) => {
+    setNotification({ type: type, message: message})
     setTimeout(() => {
-      setNotification(null)
+      setNotification({type: '', message: null})
     }, 3000)
   }
 
@@ -61,7 +61,7 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
-          showNotification(`Added ${returnedPerson.name}`)
+          showNotification('success', `Added ${returnedPerson.name}`)
         })
       
       return
@@ -83,7 +83,15 @@ const App = () => {
             ))
             setNewName('')
             setNewNumber('')
-            showNotification(`Updated number for ${returnedPerson.name}`)
+            showNotification('success', `Updated number for ${returnedPerson.name}`)
+          })
+          .catch(error => {
+            showNotification(
+              'error',
+              `Information of ${person.name} has`
+              + ` already been removed from the server`
+            )
+            setPersons(persons.filter(p => p.id !== person.id))
           })
       }
 
@@ -102,7 +110,7 @@ const App = () => {
         .then(response => {
           if (response.status === 200) {
             setPersons(persons.filter(p => p.id !== id))
-            showNotification(`Contact deleted`)
+            showNotification('success', `Contact deleted`)
           }
         })
     }
@@ -111,7 +119,10 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} />
+      <Notification
+        type={notification.type}
+        message={notification.message}
+      />
       <Filter
         filter={filter}
         handleChange={handleFilterChange}

@@ -28,7 +28,12 @@ const App = () => {
         return <div>Too many matches, specify another filter</div>
       case shownCountries.length > 1:
         return shownCountries.map(country =>
-          <div key={country.name.common}>{country.name.common}</div>
+          <div key={country.name.common}>
+            {country.name.common}
+            <button onClick={() => setFilter(country.name.common)}>
+              show
+            </button>
+          </div>
         )
       case shownCountries.length === 1:
         return <Country country={shownCountries[0]} />

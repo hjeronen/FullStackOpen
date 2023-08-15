@@ -27,28 +27,47 @@ const mostBlogs = (blogs) => {
     return null
   }
 
-  const writers = blogs.map(blog => blog.author).sort()
-
   let stats = {}
-  writers.forEach(writer => 
-    stats[writer] ? stats[writer] += 1 : stats[writer] = 1
+  blogs.forEach(blog =>
+    stats[blog.author] ? stats[blog.author] += 1 : stats[blog.author] = 1
   )
 
-  const writer = Object.keys(stats).reduce((max, next) => 
+  const writerWithMostBlogs = Object.keys(stats).reduce((max, next) =>
     stats[max] > stats[next] ? max : next
   )
 
-  const result = {
-    author: writer,
-    blogs: stats[writer]
+  return {
+    author: writerWithMostBlogs,
+    blogs: stats[writerWithMostBlogs]
+  }
+}
+
+const mostLikes = (blogs) => {
+  if (blogs.length === 0) {
+    return null
   }
 
-  return result
+  let stats = {}
+  blogs.forEach(blog =>
+    stats[blog.author]
+      ? stats[blog.author] += blog.likes
+      : stats[blog.author] = blog.likes
+  )
+
+  const writerWithMostLikes = Object.keys(stats).reduce((max, next) =>
+    stats[max] > stats[next] ? max : next
+  )
+
+  return {
+    author: writerWithMostLikes,
+    likes: stats[writerWithMostLikes]
+  }
 }
 
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }

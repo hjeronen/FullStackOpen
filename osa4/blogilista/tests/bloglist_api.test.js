@@ -60,6 +60,30 @@ test('if field likes has no initial value, it is set to 0', async () => {
   expect(response.body.likes).toBe(0)
 })
 
+test('a blog without the field title cannot be added', async () => {
+  const testBlog = {
+    author: "Tester Test",
+    url: "https://test.url.org"
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(testBlog)
+    .expect(400)
+})
+
+test('a blog without the field url cannot be added', async () => {
+  const testBlog = {
+    title: "Testing adding without url",
+    author: "Tester Test"
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(testBlog)
+    .expect(400)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })

@@ -23,7 +23,14 @@ test('blogs are returned as json', async () => {
 test('all blogs are returned', async () => {
   const response = await api.get('/api/blogs')
 
-    expect(response.body).toHaveLength(2)
+  expect(response.body).toHaveLength(2)
+})
+
+test('blog identifier is named id, not _id', async () => {
+  const response = await api.get('/api/blogs')
+  const blog = response.body[0]
+
+  expect(blog.id).toBeDefined()
 })
 
 afterAll(async () => {

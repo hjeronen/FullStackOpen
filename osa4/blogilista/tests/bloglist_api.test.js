@@ -3,7 +3,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
-const { blogs } = require('./testBlogs')
+const { blogs, newBlog } = require('./testBlogs')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -31,6 +31,20 @@ test('blog identifier is named id, not _id', async () => {
   const blog = response.body[0]
 
   expect(blog.id).toBeDefined()
+})
+
+test('a new blog can be added', async () => {
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+  
+  const response = await api.get('/api/blogs')
+  const titles = response.body.map(blog => blog.title)
+  
+  expect(response.body).toHaveLength(3)
+  expect(titles).toContain('First class tests')
 })
 
 afterAll(async () => {

@@ -62,8 +62,16 @@ const blogs = [
   }
 ]
 
+const newBlog = {
+  title: "First class tests",
+  author: "Robert C. Martin",
+  url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+  likes: 10
+}
+
 module.exports = {
   emptyList,
   listWithOneBlog,
-  blogs
+  blogs,
+  newBlog
 }

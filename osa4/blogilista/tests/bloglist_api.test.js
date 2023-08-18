@@ -47,6 +47,19 @@ test('a new blog can be added', async () => {
   expect(titles).toContain('First class tests')
 })
 
+test('if field likes has no initial value, it is set to 0', async () => {
+  const testBlog = {
+    title: "Testing if likes are 0",
+    author: "Tester Test",
+    url: "https://test.url.org"
+  }
+
+  const response = await api.post('/api/blogs').send(testBlog)
+
+  expect(response.body.likes).toBeDefined()
+  expect(response.body.likes).toBe(0)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })

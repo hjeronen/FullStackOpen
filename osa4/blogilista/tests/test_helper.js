@@ -4,12 +4,16 @@ const nonExistingId = async () => {
   const blog = new Blog({
     title: "This will be removed",
     author: "Tester Test",
-    url: "https://fakeurl.org"
+    url: "https://fakeurl.org",
+    likes: 2
   })
-  await blog.save()
-  await blog.remove()
 
-  return blog._id.toString()
+  const savedBlog = await blog.save()
+  const id = savedBlog._id.toString()
+
+  await Blog.findByIdAndRemove(id)
+
+  return id
 }
 
 const blogsInDb = async () => {

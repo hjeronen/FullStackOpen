@@ -3,15 +3,33 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const { blogs, newBlog } = require('./testBlogs')
 const helper = require('./test_helper')
+const bcrypt = require('bcrypt')
 
-beforeEach(async () => {
-  await Blog.deleteMany({})
-  await Blog.insertMany(blogs)
+beforeAll(async () => {
+  await User.deleteMany({})
+
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'root', passwordHash })
+
+  await user.save()
 })
 
 describe('when there are blogs saved in db', () => {
+
+  beforeEach(async () => {
+    const user = await helper.getRootUser()
+  
+    const blogsToSave = blogs.map(blog => {
+      blog.user = user.id
+      return blog
+    })
+  
+    await Blog.deleteMany({})
+    await Blog.insertMany(blogsToSave)
+  })
 
   test('blogs are returned as json', async () => {
     await api
@@ -35,10 +53,12 @@ describe('when there are blogs saved in db', () => {
 
   describe('when posting a new blog', () => {
 
-    test('a new blog can be added', async () => {
+    test('a new blog can be added with a valid token', async () => {
+      const token = await helper.getValidToken()
       await api
         .post('/api/blogs')
         .send(newBlog)
+        .set('Authorization', `Bearer ${token}`)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -46,7 +66,22 @@ describe('when there are blogs saved in db', () => {
       const titles = allBlogs.map(blog => blog.title)
 
       expect(allBlogs).toHaveLength(blogs.length + 1)
-      expect(titles).toContain('First class tests')
+      expect(titles).toContain(newBlog.title)
+    })
+
+    test('a new blog cannot be added without a valid token', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const titles = blogsAtEnd.map(blog => blog.title)
+
+      expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
+      expect(titles).not.toContain(newBlog.title)
     })
 
     test('if field likes has no initial value, it is set to 0', async () => {
@@ -56,7 +91,11 @@ describe('when there are blogs saved in db', () => {
         url: "https://test.url.org"
       }
 
-      const response = await api.post('/api/blogs').send(testBlog)
+      const token = await helper.getValidToken()
+      const response = await api
+        .post('/api/blogs')
+        .send(testBlog)
+        .set('Authorization', `Bearer ${token}`)
 
       expect(response.body.likes).toBeDefined()
       expect(response.body.likes).toBe(0)
@@ -68,9 +107,11 @@ describe('when there are blogs saved in db', () => {
         url: "https://test.url.org"
       }
 
+      const token = await helper.getValidToken()
       await api
         .post('/api/blogs')
         .send(testBlog)
+        .set('Authorization', `Bearer ${token}`)
         .expect(400)
     })
 
@@ -80,9 +121,11 @@ describe('when there are blogs saved in db', () => {
         author: "Tester Test"
       }
 
+      const token = await helper.getValidToken()
       await api
         .post('/api/blogs')
         .send(testBlog)
+        .set('Authorization', `Bearer ${token}`)
         .expect(400)
     })
 
@@ -94,8 +137,10 @@ describe('when there are blogs saved in db', () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart[0]
 
+      const token = await helper.getValidToken()
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
@@ -108,8 +153,10 @@ describe('when there are blogs saved in db', () => {
     })
 
     test('a blog with invalid id will return error code 400', async () => {
+      const token = await helper.getValidToken()
       await api
         .delete(`/api/blogs/${helper.nonExistingId()}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(400)
     })
 
@@ -124,9 +171,9 @@ describe('when there are blogs saved in db', () => {
 
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
-        .send({...blogToUpdate, likes: newLikes})
+        .send({ ...blogToUpdate, likes: newLikes })
         .expect(200)
-      
+
       const blogsAtEnd = await helper.blogsInDb()
       const updatedBlog = blogsAtEnd.find(blog => blog.id === blogToUpdate.id)
 
@@ -171,5 +218,7 @@ describe('when there are blogs saved in db', () => {
 })
 
 afterAll(async () => {
+  await User.deleteMany({})
+  await Blog.deleteMany({})
   await mongoose.connection.close()
 })

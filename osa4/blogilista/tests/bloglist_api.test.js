@@ -7,26 +7,37 @@ const User = require('../models/user')
 const { blogs, newBlog } = require('./testBlogs')
 const helper = require('./test_helper')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+
+const blogAdmin = 'testUser'
+let token
+let user
 
 beforeAll(async () => {
   await User.deleteMany({})
 
   const passwordHash = await bcrypt.hash('sekret', 10)
-  const user = new User({ username: 'root', passwordHash })
+  user = new User({ username: blogAdmin, passwordHash })
 
-  await user.save()
+  user = await user.save()
+
+  token = jwt.sign(
+    {
+      username: user.username,
+      id: user._id
+    },
+    process.env.SECRET
+  )
 })
 
 describe('when there are blogs saved in db', () => {
 
   beforeEach(async () => {
-    const user = await helper.getRootUser()
-  
     const blogsToSave = blogs.map(blog => {
       blog.user = user.id
       return blog
     })
-  
+
     await Blog.deleteMany({})
     await Blog.insertMany(blogsToSave)
   })
@@ -54,7 +65,6 @@ describe('when there are blogs saved in db', () => {
   describe('when posting a new blog', () => {
 
     test('a new blog can be added with a valid token', async () => {
-      const token = await helper.getValidToken()
       await api
         .post('/api/blogs')
         .send(newBlog)
@@ -86,16 +96,16 @@ describe('when there are blogs saved in db', () => {
 
     test('if field likes has no initial value, it is set to 0', async () => {
       const testBlog = {
-        title: "Testing if likes are 0",
-        author: "Tester Test",
-        url: "https://test.url.org"
+        title: 'Testing if likes are 0',
+        author: 'Tester Test',
+        url: 'https://test.url.org'
       }
 
-      const token = await helper.getValidToken()
       const response = await api
         .post('/api/blogs')
         .send(testBlog)
         .set('Authorization', `Bearer ${token}`)
+        .expect(201)
 
       expect(response.body.likes).toBeDefined()
       expect(response.body.likes).toBe(0)
@@ -103,11 +113,10 @@ describe('when there are blogs saved in db', () => {
 
     test('a blog without the field title cannot be added', async () => {
       const testBlog = {
-        author: "Tester Test",
-        url: "https://test.url.org"
+        author: 'Tester Test',
+        url: 'https://test.url.org'
       }
 
-      const token = await helper.getValidToken()
       await api
         .post('/api/blogs')
         .send(testBlog)
@@ -117,11 +126,10 @@ describe('when there are blogs saved in db', () => {
 
     test('a blog without the field url cannot be added', async () => {
       const testBlog = {
-        title: "Testing adding without url",
-        author: "Tester Test"
+        title: 'Testing adding without url',
+        author: 'Tester Test'
       }
 
-      const token = await helper.getValidToken()
       await api
         .post('/api/blogs')
         .send(testBlog)
@@ -137,7 +145,6 @@ describe('when there are blogs saved in db', () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart[0]
 
-      const token = await helper.getValidToken()
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
         .set('Authorization', `Bearer ${token}`)
@@ -153,7 +160,6 @@ describe('when there are blogs saved in db', () => {
     })
 
     test('a blog with invalid id will return error code 400', async () => {
-      const token = await helper.getValidToken()
       await api
         .delete(`/api/blogs/${helper.nonExistingId()}`)
         .set('Authorization', `Bearer ${token}`)
@@ -182,9 +188,9 @@ describe('when there are blogs saved in db', () => {
 
     test('invalid id will return error code 400', async () => {
       const blogToUpdate = {
-        title: "Invalid id should return 400",
-        author: "Tester Test",
-        url: "http://fakeurl.com",
+        title: 'Invalid id should return 400',
+        author: 'Tester Test',
+        url: 'http://fakeurl.com',
         id: helper.nonExistingId()
       }
 
@@ -196,7 +202,7 @@ describe('when there are blogs saved in db', () => {
 
     test('empty title will return error code 400', async () => {
       const blogsAtStart = await helper.blogsInDb()
-      const blogToUpdate = { ...blogsAtStart[0], title: "" }
+      const blogToUpdate = { ...blogsAtStart[0], title: '' }
 
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
@@ -206,7 +212,7 @@ describe('when there are blogs saved in db', () => {
 
     test('empty url will return error code 400', async () => {
       const blogsAtStart = await helper.blogsInDb()
-      const blogToUpdate = { ...blogsAtStart[0], url: "" }
+      const blogToUpdate = { ...blogsAtStart[0], url: '' }
 
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
@@ -218,7 +224,5 @@ describe('when there are blogs saved in db', () => {
 })
 
 afterAll(async () => {
-  await User.deleteMany({})
-  await Blog.deleteMany({})
   await mongoose.connection.close()
 })

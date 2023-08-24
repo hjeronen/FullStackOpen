@@ -13,6 +13,11 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', userExtractor, async (request, response) => {
   const userId = request.user.id
+  const user = await User.findById(userId)
+
+  if (!user) {
+    return response.status(401).json({ error: 'Invalid user id' })
+  }
 
   const blog = new Blog({
     title: request.body.title,
@@ -24,7 +29,6 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
 
   const savedBlog = await blog.save()
 
-  const user = await User.findById(userId)
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 

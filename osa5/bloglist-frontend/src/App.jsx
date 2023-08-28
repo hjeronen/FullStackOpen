@@ -8,6 +8,9 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -20,6 +23,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      blogService.setToken(user.token)
     }
   }, [])
 
@@ -31,11 +35,12 @@ const App = () => {
         username, password,
       })
       window.localStorage.setItem('user', JSON.stringify(user))
+      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
-      console.log('failed to login')
+      console.log(exception)
     }
   }
 
@@ -78,11 +83,6 @@ const App = () => {
   const renderBlogs = () => {
     return (
       <div>
-        <div>
-          {user.name} logged in
-          <button onClick={handleLogout}>logout</button>
-        </div>
-        <br></br>
         {blogs
           .filter(blog => blog.user.username === user.username)
           .map(blog =>
@@ -92,11 +92,80 @@ const App = () => {
     )
   }
 
+  const createNewBlog = async (event) => {
+    event.preventDefault()
+
+    try {
+      const newBlog = {
+        title: title,
+        author: author,
+        url: url
+      }
+      const createdBlog = await blogService.create(newBlog)
+      createdBlog.user = user
+      setBlogs(blogs.concat(createdBlog))
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+    } catch (exception) {
+      console.log(exception)
+    }
+  }
+
+  const newBlogForm = () => {
+    return (
+      <form onSubmit={createNewBlog}>
+        <h2>Create new blog</h2>
+        <div>
+          title:
+          <input
+            type="text"
+            value={title}
+            name="Title"
+            onChange={({ target }) => setTitle(target.value)}
+          />
+        </div>
+        <div>
+          author:
+          <input
+            type="text"
+            value={author}
+            name="Author"
+            onChange={({ target }) => setAuthor(target.value)}
+          />
+        </div>
+        <div>
+          url:
+          <input
+            type="text"
+            value={url}
+            name="Url"
+            onChange={({ target }) => setUrl(target.value)}
+          />
+        </div>
+        <button type="submit">Create</button>
+      </form>
+    )
+  }
+
+  const renderUser = () => {
+    return (
+      <div>
+        <div>
+          {user.name} logged in
+          <button onClick={handleLogout}>logout</button>
+        </div>
+        {newBlogForm()}
+        {renderBlogs()}
+      </div>
+    )
+  }
+
   return (
     <div>
       <h2>Bloglist</h2>
       {user
-        ? renderBlogs()
+        ? renderUser()
         : loginForm()
       }
     </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -9,15 +10,14 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [notification, setNotification] = useState({ type: '', message: null })
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
+    blogService
+      .getAll()
+      .then(blogs =>
+        setBlogs(blogs)
+      )
   }, [])
 
   useEffect(() => {
@@ -30,9 +30,9 @@ const App = () => {
   }, [])
 
   const showNotification = (type, message) => {
-    setNotification({ type: type, message: message})
+    setNotification({ type: type, message: message })
     setTimeout(() => {
-      setNotification({type: '', message: null})
+      setNotification({ type: '', message: null })
     }, 3000)
   }
 
@@ -104,67 +104,23 @@ const App = () => {
     )
   }
 
-  const createNewBlog = async (event) => {
-    event.preventDefault()
-
+  const addNewBlog = async (newBlog) => {
     try {
-      const newBlog = {
-        title: title,
-        author: author,
-        url: url
-      }
       const createdBlog = await blogService.create(newBlog)
       createdBlog.user = user
       setBlogs(blogs.concat(createdBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
       showNotification(
         'success',
         `A new blog ${createdBlog.title} by ${createdBlog.author} added`
       )
+      return true
     } catch (exception) {
       showNotification(
         'error',
         `Error: ${exception.response.data.error}`
       )
+      return false
     }
-  }
-
-  const newBlogForm = () => {
-    return (
-      <form onSubmit={createNewBlog}>
-        <h2>Create new blog</h2>
-        <div>
-          title:
-          <input
-            type="text"
-            value={title}
-            name="Title"
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          author:
-          <input
-            type="text"
-            value={author}
-            name="Author"
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url:
-          <input
-            type="text"
-            value={url}
-            name="Url"
-            onChange={({ target }) => setUrl(target.value)}
-          />
-        </div>
-        <button type="submit">Create</button>
-      </form>
-    )
   }
 
   const renderUser = () => {
@@ -174,7 +130,11 @@ const App = () => {
           {user.name} logged in
           <button onClick={handleLogout}>logout</button>
         </div>
-        {newBlogForm()}
+        <br/>
+        <Togglable
+          buttonLabel={'new blog'}
+          addNewBlog={addNewBlog}
+        />
         {renderBlogs()}
       </div>
     )

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -11,6 +12,7 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [notification, setNotification] = useState({ type: '', message: null })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -27,6 +29,13 @@ const App = () => {
     }
   }, [])
 
+  const showNotification = (type, message) => {
+    setNotification({ type: type, message: message})
+    setTimeout(() => {
+      setNotification({type: '', message: null})
+    }, 3000)
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -40,7 +49,10 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      console.log(exception)
+      showNotification(
+        'error',
+        `Error: ${exception.response.data.error}`
+      )
     }
   }
 
@@ -107,8 +119,15 @@ const App = () => {
       setTitle('')
       setAuthor('')
       setUrl('')
+      showNotification(
+        'success',
+        `A new blog ${createdBlog.title} by ${createdBlog.author} added`
+      )
     } catch (exception) {
-      console.log(exception)
+      showNotification(
+        'error',
+        `Error: ${exception.response.data.error}`
+      )
     }
   }
 
@@ -164,6 +183,10 @@ const App = () => {
   return (
     <div>
       <h2>Bloglist</h2>
+      <Notification
+        type={notification.type}
+        message={notification.message}
+      />
       {user
         ? renderUser()
         : loginForm()

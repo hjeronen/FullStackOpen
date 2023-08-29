@@ -25,7 +25,7 @@ const Blog = ({ blog }) => {
       {expanded
         ?
         <div>
-          <div>{blog.url}</div>
+          <a href={blog.url}>{blog.url}</a>
           <div>
             likes {blog.likes}
             <button>like</button>

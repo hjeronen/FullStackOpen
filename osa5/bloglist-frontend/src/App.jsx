@@ -92,13 +92,37 @@ const App = () => {
     )
   }
 
+  const updateBlog = async (updatedBlog) => {
+    try {
+      const newBlog = await blogService.update(updatedBlog)
+      newBlog.user = user
+      const oldBlogList = blogs.filter(blog => blog.id !== newBlog.id)
+      const newBlogList = oldBlogList.concat(newBlog)
+      newBlogList.sort((a, b) =>
+        a.id > b.id
+          ? 1
+          : (a.id < b.id ? -1 : 0)
+      )
+      setBlogs(newBlogList)
+    } catch (exception) {
+      showNotification(
+        'error',
+        `Error: ${exception.response.data.error}`
+      )
+    }
+  }
+
   const renderBlogs = () => {
     return (
       <div>
         {blogs
           .filter(blog => blog.user.username === user.username)
           .map(blog =>
-            <Blog key={blog.id} blog={blog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              updateBlog={updateBlog}
+            />
           )}
       </div>
     )
@@ -107,7 +131,8 @@ const App = () => {
   const addNewBlog = async (newBlog) => {
     try {
       const createdBlog = await blogService.create(newBlog)
-      createdBlog.user = user
+      const blogUser = {...user, id: createdBlog.user}
+      createdBlog.user = blogUser
       setBlogs(blogs.concat(createdBlog))
       showNotification(
         'success',
@@ -130,7 +155,7 @@ const App = () => {
           {user.name} logged in
           <button onClick={handleLogout}>logout</button>
         </div>
-        <br/>
+        <br />
         <Togglable
           buttonLabel={'new blog'}
           addNewBlog={addNewBlog}

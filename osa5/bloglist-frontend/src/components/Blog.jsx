@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
   const [expanded, setExpanded] = useState(false)
@@ -48,7 +49,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
               ? <button
                 style={{ backgroundColor: '#349feb' }}
                 onClick={() => deleteBlog(blog)}
-                >
+              >
                 delete
               </button>
               : <div></div>
@@ -60,6 +61,13 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
       }
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  updateBlog: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired
 }
 
 export default Blog

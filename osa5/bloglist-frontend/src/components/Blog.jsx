@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const Blog = ({ blog, updateBlog }) => {
+const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
   const [expanded, setExpanded] = useState(false)
 
   const blogStyle = {
@@ -18,7 +18,7 @@ const Blog = ({ blog, updateBlog }) => {
       user: blog.user.id
     }
 
-    updateBlog(updatedBlog)
+    updateBlog(updatedBlog, blog.user)
   }
 
   return (
@@ -42,6 +42,17 @@ const Blog = ({ blog, updateBlog }) => {
           </div>
           <div>
             {blog.user.name}
+          </div>
+          <div>
+            {blog.user.username === user.username
+              ? <button
+                style={{ backgroundColor: '#349feb' }}
+                onClick={() => deleteBlog(blog)}
+                >
+                delete
+              </button>
+              : <div></div>
+            }
           </div>
         </div>
         :

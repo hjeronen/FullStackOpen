@@ -29,8 +29,15 @@ const App = () => {
     }
   }, [])
 
-  const showNotification = (type, message) => {
-    setNotification({ type: type, message: message })
+  const showSuccessNotification = (message) => {
+    setNotification({ type: 'success', message: message })
+    setTimeout(() => {
+      setNotification({ type: '', message: null })
+    }, 3000)
+  }
+
+  const showError = (exception) => {
+    setNotification({ type: 'error', message: exception.response.data.error })
     setTimeout(() => {
       setNotification({ type: '', message: null })
     }, 3000)
@@ -49,10 +56,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      showNotification(
-        'error',
-        `Error: ${exception.response.data.error}`
-      )
+      showError(exception)
     }
   }
 
@@ -92,20 +96,28 @@ const App = () => {
     )
   }
 
-  const updateBlog = async (updatedBlog) => {
+  const updateBlog = async (updatedBlog, blogUser) => {
     try {
       const newBlog = await blogService.update(updatedBlog)
-      const blogUser = {...user, id: newBlog.user}
       newBlog.user = blogUser
       const newBlogList = blogs
         .filter(blog => blog.id !== newBlog.id)
         .concat(newBlog)
       setBlogs(newBlogList)
     } catch (exception) {
-      showNotification(
-        'error',
-        `Error: ${exception.response.data.error}`
-      )
+      showError(exception)
+    }
+  }
+
+  const deleteBlog = async (deletedBlog) => {
+    if (confirm(`Remove blog ${deletedBlog.title} by ${deletedBlog.author}?`)) {
+      try {
+        await blogService.deleteBlog(deletedBlog)
+        setBlogs(blogs.filter(blog => blog.id !== deletedBlog.id))
+        showSuccessNotification('Blog deleted')
+      } catch (exception) {
+        showError(exception)
+      }
     }
   }
 
@@ -113,13 +125,14 @@ const App = () => {
     return (
       <div>
         {blogs
-          .filter(blog => blog.user.username === user.username)
           .sort((a, b) => b.likes - a.likes)
           .map(blog =>
             <Blog
               key={blog.id}
               blog={blog}
               updateBlog={updateBlog}
+              deleteBlog={deleteBlog}
+              user={user}
             />
           )}
       </div>
@@ -132,16 +145,12 @@ const App = () => {
       const blogUser = {...user, id: createdBlog.user}
       createdBlog.user = blogUser
       setBlogs(blogs.concat(createdBlog))
-      showNotification(
-        'success',
+      showSuccessNotification(
         `A new blog ${createdBlog.title} by ${createdBlog.author} added`
       )
       return true
     } catch (exception) {
-      showNotification(
-        'error',
-        `Error: ${exception.response.data.error}`
-      )
+      showError(exception)
       return false
     }
   }

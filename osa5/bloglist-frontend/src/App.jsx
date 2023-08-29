@@ -95,14 +95,11 @@ const App = () => {
   const updateBlog = async (updatedBlog) => {
     try {
       const newBlog = await blogService.update(updatedBlog)
-      newBlog.user = user
-      const oldBlogList = blogs.filter(blog => blog.id !== newBlog.id)
-      const newBlogList = oldBlogList.concat(newBlog)
-      newBlogList.sort((a, b) =>
-        a.id > b.id
-          ? 1
-          : (a.id < b.id ? -1 : 0)
-      )
+      const blogUser = {...user, id: newBlog.user}
+      newBlog.user = blogUser
+      const newBlogList = blogs
+        .filter(blog => blog.id !== newBlog.id)
+        .concat(newBlog)
       setBlogs(newBlogList)
     } catch (exception) {
       showNotification(
@@ -117,6 +114,7 @@ const App = () => {
       <div>
         {blogs
           .filter(blog => blog.user.username === user.username)
+          .sort((a, b) => b.likes - a.likes)
           .map(blog =>
             <Blog
               key={blog.id}

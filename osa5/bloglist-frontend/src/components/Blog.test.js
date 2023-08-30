@@ -74,3 +74,26 @@ test('other blog info is rendered after pressing the button', async () => {
   const userNameAfter = screen.queryByText(blog.user.name)
   expect(userNameAfter).toBeDefined()
 })
+
+test('pressing like button twice calls mockhandler twice', async () => {
+  render(
+    <Blog
+      blog={blog}
+      updateBlog={updateBlog}
+      deleteBlog={deleteBlog}
+      user={user} />
+  )
+
+  const clicker = userEvent.setup()
+  const viewButton = screen.getByText('view')
+  await clicker.click(viewButton)
+
+  const likeButtonFirst = screen.getByText('like')
+  await clicker.click(likeButtonFirst)
+
+  await clicker.click(viewButton)
+  const likeButtonSecond = screen.getByText('like')
+  await clicker.click(likeButtonSecond)
+
+  expect(updateBlog.mock.calls).toHaveLength(2)
+})

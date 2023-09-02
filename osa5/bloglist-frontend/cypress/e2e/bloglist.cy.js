@@ -1,3 +1,5 @@
+import { blogs } from './testBlogs'
+
 describe('Blog app', function () {
   beforeEach(function () {
     cy.request('POST', `${Cypress.env('BACKEND')}/testing/reset`)
@@ -43,9 +45,10 @@ describe('Blog app', function () {
 
   describe('When logged in', function() {
     beforeEach(function() {
-      cy.get('#username').type('testuser')
-      cy.get('#password').type('supersecret')
-      cy.get('#loginButton').click()
+      cy.login({ username: 'testuser', password: 'supersecret' })
+      cy.createTestBlog(blogs[0])
+      cy.createTestBlog(blogs[1])
+      cy.createTestBlog(blogs[2])
     })
 
     it('A blog can be created', function() {
@@ -56,6 +59,15 @@ describe('Blog app', function () {
       cy.get('#createButton').click()
 
       cy.contains('Brave New Blog')
+    })
+
+    it('User can like a blog', function() {
+      cy.contains('React patterns').click()
+      cy.contains('likes 7')
+      cy.contains('like').click()
+      
+      cy.contains('React patterns').click()
+      cy.contains('likes 8')
     })
   })
 })

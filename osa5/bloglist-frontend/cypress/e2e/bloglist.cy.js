@@ -108,5 +108,22 @@ describe('Blog app', function () {
       cy.contains('React patterns').click()
       cy.get('#delete').should('not.exist')
     })
+
+    it('Blogs are ordered by amount of likes', function () {
+      cy.get('.blog').eq(0).should('contain', 'Canonical string reduction')
+      cy.get('.blog').eq(1).should('contain', 'React patterns')
+      cy.get('.blog').eq(2).should('contain', 'Go To Statement Considered Harmful')
+
+      cy.contains('Go To Statement Considered Harmful').click()
+      cy.contains('like').click()
+      cy.contains('Go To Statement Considered Harmful').click()
+      cy.contains('like').click()
+      cy.contains('Go To Statement Considered Harmful').click()
+      cy.contains('like').click()
+
+      cy.get('.blog').eq(0).should('contain', 'Canonical string reduction')
+      cy.get('.blog').eq(1).should('contain', 'Go To Statement Considered Harmful')
+      cy.get('.blog').eq(2).should('contain', 'React patterns')
+    })
   })
 })

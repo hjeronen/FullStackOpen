@@ -24,6 +24,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
 
   return (
     <div
+      class='blog'
       style={blogStyle}
       onClick={() => setExpanded(!expanded)}
     >

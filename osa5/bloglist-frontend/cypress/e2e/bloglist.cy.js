@@ -85,5 +85,28 @@ describe('Blog app', function () {
 
       cy.get('html').should('not.contain', 'React patterns')
     })
+
+    it('Only user that added blog can see delete button', function () {
+      cy.contains('Test User logged in')
+      cy.contains('React patterns').click()
+      cy.get('#deleteButton').should('exist')
+
+      cy.contains('logout').click()
+      
+      const secondUser = {
+        username: 'second',
+        name: 'Second User',
+        password: 'sosecret'
+      }
+      cy.request('POST', 'http://localhost:3003/api/users/', secondUser)
+      cy.login({
+        username: secondUser.username,
+        password: secondUser.password
+      })
+
+      cy.contains('Second User logged in')
+      cy.contains('React patterns').click()
+      cy.get('#delete').should('not.exist')
+    })
   })
 })

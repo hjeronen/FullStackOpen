@@ -92,7 +92,7 @@ describe('Blog app', function () {
       cy.get('#deleteButton').should('exist')
 
       cy.contains('logout').click()
-      
+
       const secondUser = {
         username: 'second',
         name: 'Second User',

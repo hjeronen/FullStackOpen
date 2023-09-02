@@ -54,7 +54,7 @@ test('other blog info is rendered after pressing the button', async () => {
 
   const urlBefore = screen.queryByText(blog.url)
   expect(urlBefore).toBeNull()
-  
+
   const likesBefore = screen.queryByText(`likes: ${blog.likes}`)
   expect(likesBefore).toBeNull()
 
@@ -67,7 +67,7 @@ test('other blog info is rendered after pressing the button', async () => {
 
   const urlAfter = screen.queryByText(blog.url)
   expect(urlAfter).toBeDefined()
-  
+
   const likesAfter = screen.queryByText(`likes: ${blog.likes}`)
   expect(likesAfter).toBeDefined()
 

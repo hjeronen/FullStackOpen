@@ -47,6 +47,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
           <div>
             {blog.user.username === user.username
               ? <button
+                id='deleteButton'
                 style={{ backgroundColor: '#349feb' }}
                 onClick={() => deleteBlog(blog)}
               >

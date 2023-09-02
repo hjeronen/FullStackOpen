@@ -43,15 +43,15 @@ describe('Blog app', function () {
     })
   })
 
-  describe('When logged in', function() {
-    beforeEach(function() {
+  describe('When logged in', function () {
+    beforeEach(function () {
       cy.login({ username: 'testuser', password: 'supersecret' })
       cy.createTestBlog(blogs[0])
       cy.createTestBlog(blogs[1])
       cy.createTestBlog(blogs[2])
     })
 
-    it('A blog can be created', function() {
+    it('A blog can be created', function () {
       cy.contains('new blog').click()
       cy.get('#title').type('Brave New Blog')
       cy.get('#author').type('Test Author')
@@ -61,13 +61,29 @@ describe('Blog app', function () {
       cy.contains('Brave New Blog')
     })
 
-    it('User can like a blog', function() {
+    it('User can like a blog', function () {
       cy.contains('React patterns').click()
       cy.contains('likes 7')
       cy.contains('like').click()
-      
+
       cy.contains('React patterns').click()
       cy.contains('likes 8')
+    })
+
+    it('User can delete their blog', function () {
+      cy.contains('React patterns').click()
+      cy.get('#deleteButton').click()
+      cy.clock()
+
+      cy.get('#success')
+        .should('contain', 'Blog deleted')
+        .and('have.css', 'color', 'rgb(0, 128, 0)')
+        .and('have.css', 'border-style', 'solid')
+
+      cy.tick(3000)
+      cy.get('#success').should('not.exist')
+
+      cy.get('html').should('not.contain', 'React patterns')
     })
   })
 })

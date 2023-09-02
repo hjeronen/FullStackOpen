@@ -40,4 +40,22 @@ describe('Blog app', function () {
       cy.contains('Test User logged in').should('not.exist')
     })
   })
+
+  describe('When logged in', function() {
+    beforeEach(function() {
+      cy.get('#username').type('testuser')
+      cy.get('#password').type('supersecret')
+      cy.get('#loginButton').click()
+    })
+
+    it('A blog can be created', function() {
+      cy.contains('new blog').click()
+      cy.get('#title').type('Brave New Blog')
+      cy.get('#author').type('Test Author')
+      cy.get('#url').type('http://fakeurl.org')
+      cy.get('#createButton').click()
+
+      cy.contains('Brave New Blog')
+    })
+  })
 })

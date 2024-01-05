@@ -10,7 +10,7 @@ const deleteBlog = jest.fn()
 const user = {
   username: 'testuser',
   name: 'Test User',
-  id: '012345'
+  id: '012345',
 }
 
 const blog = {
@@ -18,7 +18,7 @@ const blog = {
   author: 'Jest Tester',
   url: 'http://fakeurl.org',
   likes: 5,
-  user: user
+  user: user,
 }
 
 test('only title and author are rendered', () => {
@@ -27,7 +27,8 @@ test('only title and author are rendered', () => {
       blog={blog}
       updateBlog={updateBlog}
       deleteBlog={deleteBlog}
-      user={user} />
+      user={user}
+    />
   )
 
   const title = screen.queryByText(blog.title)
@@ -49,7 +50,8 @@ test('other blog info is rendered after pressing the button', async () => {
       blog={blog}
       updateBlog={updateBlog}
       deleteBlog={deleteBlog}
-      user={user} />
+      user={user}
+    />
   )
 
   const urlBefore = screen.queryByText(blog.url)
@@ -81,7 +83,8 @@ test('pressing like button twice calls mockhandler twice', async () => {
       blog={blog}
       updateBlog={updateBlog}
       deleteBlog={deleteBlog}
-      user={user} />
+      user={user}
+    />
   )
 
   const clicker = userEvent.setup()

@@ -12,7 +12,7 @@ const BlogForm = ({ createBlog }) => {
     const newBlog = {
       title: title,
       author: author,
-      url: url
+      url: url,
     }
 
     const created = await createBlog(newBlog)
@@ -56,13 +56,15 @@ const BlogForm = ({ createBlog }) => {
           onChange={({ target }) => setUrl(target.value)}
         />
       </div>
-      <button id='createButton' type='submit'>create</button>
+      <button id='createButton' type='submit'>
+        create
+      </button>
     </form>
   )
 }
 
 BlogForm.propTypes = {
-  createBlog: PropTypes.func.isRequired
+  createBlog: PropTypes.func.isRequired,
 }
 
 export default BlogForm

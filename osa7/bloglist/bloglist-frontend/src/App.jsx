@@ -15,11 +15,7 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService
-      .getAll()
-      .then(blogs =>
-        setBlogs(blogs)
-      )
+    blogService.getAll().then((blogs) => setBlogs(blogs))
   }, [])
 
   useEffect(() => {
@@ -50,7 +46,8 @@ const App = () => {
 
     try {
       const user = await loginService.login({
-        username, password,
+        username,
+        password,
       })
       window.localStorage.setItem('user', JSON.stringify(user))
       blogService.setToken(user.token)
@@ -94,7 +91,9 @@ const App = () => {
               onChange={({ target }) => setPassword(target.value)}
             />
           </div>
-          <button id='loginButton' type='submit'>login</button>
+          <button id='loginButton' type='submit'>
+            login
+          </button>
         </form>
       </div>
     )
@@ -105,7 +104,7 @@ const App = () => {
       const newBlog = await blogService.update(updatedBlog)
       newBlog.user = blogUser
       const newBlogList = blogs
-        .filter(blog => blog.id !== newBlog.id)
+        .filter((blog) => blog.id !== newBlog.id)
         .concat(newBlog)
       setBlogs(newBlogList)
     } catch (exception) {
@@ -117,7 +116,7 @@ const App = () => {
     if (confirm(`Remove blog ${deletedBlog.title} by ${deletedBlog.author}?`)) {
       try {
         await blogService.deleteBlog(deletedBlog)
-        setBlogs(blogs.filter(blog => blog.id !== deletedBlog.id))
+        setBlogs(blogs.filter((blog) => blog.id !== deletedBlog.id))
         showSuccessNotification('Blog deleted')
       } catch (exception) {
         showError(exception)
@@ -130,7 +129,7 @@ const App = () => {
       <div>
         {blogs
           .sort((a, b) => b.likes - a.likes)
-          .map(blog =>
+          .map((blog) => (
             <Blog
               key={blog.id}
               blog={blog}
@@ -138,7 +137,7 @@ const App = () => {
               deleteBlog={deleteBlog}
               user={user}
             />
-          )}
+          ))}
       </div>
     )
   }
@@ -169,7 +168,7 @@ const App = () => {
         </div>
         <br />
         <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
-          <BlogForm createBlog={addNewBlog}/>
+          <BlogForm createBlog={addNewBlog} />
         </Togglable>
         {renderBlogs()}
       </div>
@@ -179,14 +178,8 @@ const App = () => {
   return (
     <div>
       <h2>Bloglist</h2>
-      <Notification
-        type={notification.type}
-        message={notification.message}
-      />
-      {user
-        ? renderUser()
-        : loginForm()
-      }
+      <Notification type={notification.type} message={notification.message} />
+      {user ? renderUser() : loginForm()}
     </div>
   )
 }

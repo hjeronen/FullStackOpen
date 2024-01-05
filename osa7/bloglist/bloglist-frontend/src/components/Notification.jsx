@@ -8,7 +8,7 @@ const Notification = ({ type, message }) => {
     borderStyle: 'solid',
     borderRadius: 5,
     padding: 10,
-    marginBottom: 10
+    marginBottom: 10,
   }
 
   const error = {
@@ -18,7 +18,7 @@ const Notification = ({ type, message }) => {
     borderStyle: 'solid',
     borderRadius: 5,
     padding: 10,
-    marginBottom: 10
+    marginBottom: 10,
   }
 
   if (message === null) {
@@ -26,9 +26,7 @@ const Notification = ({ type, message }) => {
   }
 
   return (
-    <div
-      id={type}
-      style={type === 'success' ? success : error}>
+    <div id={type} style={type === 'success' ? success : error}>
       {message}
     </div>
   )
@@ -36,7 +34,7 @@ const Notification = ({ type, message }) => {
 
 Notification.propTypes = {
   type: PropTypes.string.isRequired,
-  message: PropTypes.string
+  message: PropTypes.string,
 }
 
 export default Notification

@@ -6,7 +6,7 @@ describe('Blog app', function () {
     const user = {
       name: 'Test User',
       username: 'testuser',
-      password: 'supersecret'
+      password: 'supersecret',
     }
     cy.request('POST', 'http://localhost:3003/api/users/', user)
     cy.visit('')
@@ -96,12 +96,12 @@ describe('Blog app', function () {
       const secondUser = {
         username: 'second',
         name: 'Second User',
-        password: 'sosecret'
+        password: 'sosecret',
       }
       cy.request('POST', 'http://localhost:3003/api/users/', secondUser)
       cy.login({
         username: secondUser.username,
-        password: secondUser.password
+        password: secondUser.password,
       })
 
       cy.contains('Second User logged in')
@@ -112,7 +112,9 @@ describe('Blog app', function () {
     it('Blogs are ordered by amount of likes', function () {
       cy.get('.blog').eq(0).should('contain', 'Canonical string reduction')
       cy.get('.blog').eq(1).should('contain', 'React patterns')
-      cy.get('.blog').eq(2).should('contain', 'Go To Statement Considered Harmful')
+      cy.get('.blog')
+        .eq(2)
+        .should('contain', 'Go To Statement Considered Harmful')
 
       cy.contains('Go To Statement Considered Harmful').click()
       cy.contains('like').click()
@@ -122,7 +124,9 @@ describe('Blog app', function () {
       cy.contains('like').click()
 
       cy.get('.blog').eq(0).should('contain', 'Canonical string reduction')
-      cy.get('.blog').eq(1).should('contain', 'Go To Statement Considered Harmful')
+      cy.get('.blog')
+        .eq(1)
+        .should('contain', 'Go To Statement Considered Harmful')
       cy.get('.blog').eq(2).should('contain', 'React patterns')
     })
   })

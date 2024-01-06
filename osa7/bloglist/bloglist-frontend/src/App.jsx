@@ -4,6 +4,7 @@ import {
   setNotification,
   clearNotification,
 } from './reducers/notificationReducer'
+import { setBlogs, addBlog } from './reducers/blogReducer'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
@@ -12,17 +13,17 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const blogFormRef = useRef()
 
   const dispatch = useDispatch()
-  const notification = useSelector((state) => state)
+  const notification = useSelector((state) => state.notification)
+  const blogs = [...useSelector((state) => state.blogs)]
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    blogService.getAll().then((blogs) => dispatch(setBlogs(blogs)))
   }, [])
 
   useEffect(() => {
@@ -35,14 +36,14 @@ const App = () => {
   }, [])
 
   const showSuccessNotification = (message) => {
-    dispatch(setNotification('success', message))
+    dispatch(setNotification({ type: 'success', message }))
     setTimeout(() => {
       dispatch(clearNotification())
     }, 3000)
   }
 
-  const showError = (exception) => {
-    dispatch(setNotification('error', exception))
+  const showError = (message) => {
+    dispatch(setNotification({ type: 'error', message }))
     setTimeout(() => {
       dispatch(clearNotification())
     }, 3000)
@@ -113,7 +114,7 @@ const App = () => {
       const newBlogList = blogs
         .filter((blog) => blog.id !== newBlog.id)
         .concat(newBlog)
-      setBlogs(newBlogList)
+      // setBlogs(newBlogList)
     } catch (exception) {
       showError(exception)
     }
@@ -123,7 +124,7 @@ const App = () => {
     if (confirm(`Remove blog ${deletedBlog.title} by ${deletedBlog.author}?`)) {
       try {
         await blogService.deleteBlog(deletedBlog)
-        setBlogs(blogs.filter((blog) => blog.id !== deletedBlog.id))
+        // setBlogs(blogs.filter((blog) => blog.id !== deletedBlog.id))
         showSuccessNotification('Blog deleted')
       } catch (exception) {
         showError(exception)
@@ -154,7 +155,7 @@ const App = () => {
       const createdBlog = await blogService.create(newBlog)
       const blogUser = { ...user, id: createdBlog.user }
       createdBlog.user = blogUser
-      setBlogs(blogs.concat(createdBlog))
+      dispatch(addBlog(createdBlog))
       showSuccessNotification(
         `A new blog ${createdBlog.title} by ${createdBlog.author} added`
       )

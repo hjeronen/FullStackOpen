@@ -114,7 +114,7 @@ const App = () => {
       const newBlogList = blogs
         .filter((blog) => blog.id !== newBlog.id)
         .concat(newBlog)
-      // setBlogs(newBlogList)
+      dispatch(setBlogs(newBlogList))
     } catch (exception) {
       showError(exception)
     }
@@ -124,7 +124,7 @@ const App = () => {
     if (confirm(`Remove blog ${deletedBlog.title} by ${deletedBlog.author}?`)) {
       try {
         await blogService.deleteBlog(deletedBlog)
-        // setBlogs(blogs.filter((blog) => blog.id !== deletedBlog.id))
+        dispatch(setBlogs(blogs.filter((blog) => blog.id !== deletedBlog.id)))
         showSuccessNotification('Blog deleted')
       } catch (exception) {
         showError(exception)

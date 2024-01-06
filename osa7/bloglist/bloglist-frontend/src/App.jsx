@@ -5,6 +5,7 @@ import {
   clearNotification,
 } from './reducers/notificationReducer'
 import { setBlogs, addBlog } from './reducers/blogReducer'
+import { setUser, removeUser } from './reducers/userReducer'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
@@ -15,23 +16,23 @@ import loginService from './services/login'
 const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
   const blogFormRef = useRef()
 
   const dispatch = useDispatch()
   const notification = useSelector((state) => state.notification)
   const blogs = [...useSelector((state) => state.blogs)]
+  const user = useSelector((state) => state.user)
 
   useEffect(() => {
     blogService.getAll().then((blogs) => dispatch(setBlogs(blogs)))
   }, [])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('user')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
+    const loggedUser = window.localStorage.getItem('user')
+    if (loggedUser) {
+      const currentUser = JSON.parse(loggedUser)
+      dispatch(setUser(currentUser))
+      blogService.setToken(currentUser.token)
     }
   }, [])
 
@@ -53,13 +54,13 @@ const App = () => {
     event.preventDefault()
 
     try {
-      const user = await loginService.login({
+      const loggedUser = await loginService.login({
         username,
         password,
       })
-      window.localStorage.setItem('user', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
+      window.localStorage.setItem('user', JSON.stringify(loggedUser))
+      blogService.setToken(loggedUser.token)
+      dispatch(setUser(loggedUser))
       setUsername('')
       setPassword('')
     } catch (exception) {
@@ -71,7 +72,7 @@ const App = () => {
     event.preventDefault()
 
     window.localStorage.removeItem('user')
-    setUser(null)
+    dispatch(removeUser())
   }
 
   const loginForm = () => {

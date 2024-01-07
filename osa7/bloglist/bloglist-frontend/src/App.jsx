@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   setNotification,
@@ -6,10 +7,11 @@ import {
 } from './reducers/notificationReducer'
 import { setBlogs, addBlog } from './reducers/blogReducer'
 import { setUser, removeUser } from './reducers/userReducer'
-import Blog from './components/Blog'
+import Blogs from './components/Blogs'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import Notification from './components/Notification'
+import Users from './components/Users'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -133,24 +135,6 @@ const App = () => {
     }
   }
 
-  const renderBlogs = () => {
-    return (
-      <div>
-        {blogs
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              updateBlog={updateBlog}
-              deleteBlog={deleteBlog}
-              user={user}
-            />
-          ))}
-      </div>
-    )
-  }
-
   const addNewBlog = async (newBlog) => {
     try {
       const createdBlog = await blogService.create(newBlog)
@@ -179,17 +163,32 @@ const App = () => {
         <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
           <BlogForm createBlog={addNewBlog} />
         </Togglable>
-        {renderBlogs()}
       </div>
     )
   }
 
   return (
-    <div>
+    <Router>
       <h2>Bloglist</h2>
       <Notification type={notification.type} message={notification.message} />
       {user ? renderUser() : loginForm()}
-    </div>
+      {user && (
+        <Routes>
+          <Route
+            path='/'
+            element={
+              <Blogs
+                user={user}
+                blogs={blogs}
+                updateBlog={updateBlog}
+                deleteBlog={deleteBlog}
+              />
+            }
+          />
+          <Route path='/users' element={<Users />} />
+        </Routes>
+      )}
+    </Router>
   )
 }
 

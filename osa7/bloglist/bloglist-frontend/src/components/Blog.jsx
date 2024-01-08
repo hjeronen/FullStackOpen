@@ -1,6 +1,9 @@
 import PropTypes from 'prop-types'
+import { useState } from 'react'
 
-const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
+const Blog = ({ blog, updateBlog, deleteBlog, user, addComment }) => {
+  const [comment, setComment] = useState('')
+
   if (!blog) {
     return null
   }
@@ -13,6 +16,13 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
     }
 
     updateBlog(updatedBlog, blog.user)
+  }
+
+  const postComment = async (event) => {
+    event.preventDefault()
+
+    const created = await addComment(blog, comment)
+    if (created) setComment('')
   }
 
   return (
@@ -41,6 +51,16 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
           )}
         </div>
         <h3>Comments</h3>
+        <form onSubmit={postComment}>
+          <input
+            type='text'
+            value={comment}
+            name='Comment'
+            id='comment'
+            onChange={({ target }) => setComment(target.value)}
+          />
+          <button type='submit'>add comment</button>
+        </form>
         {blog.comments.length > 0 ? (
           <ul>
             {blog.comments.map((comment, i) => (

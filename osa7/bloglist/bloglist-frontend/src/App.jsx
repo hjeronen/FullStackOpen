@@ -83,7 +83,9 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      showError(exception)
+      exception.response
+        ? showError(error.data.error)
+        : showError(exception.message)
     }
   }
 
@@ -136,7 +138,7 @@ const App = () => {
         .concat(newBlog)
       dispatch(setBlogs(newBlogList))
     } catch (exception) {
-      showError(exception)
+      showError(exception.message)
     }
   }
 
@@ -145,9 +147,26 @@ const App = () => {
       try {
         await blogService.deleteBlog(deletedBlog)
         dispatch(setBlogs(blogs.filter((blog) => blog.id !== deletedBlog.id)))
+
+        const modifiedUser = users.find(
+          (user) => user.id === deletedBlog.user.id
+        )
+        const newBlogs = modifiedUser.blogs.filter(
+          (blog) => blog.id !== deletedBlog.id
+        )
+        dispatch(
+          setAllUsers(
+            users.map((user) =>
+              user.id === modifiedUser.id
+                ? { ...modifiedUser, blogs: newBlogs }
+                : user
+            )
+          )
+        )
+
         showSuccessNotification('Blog deleted')
       } catch (exception) {
-        showError(exception)
+        showError(exception.message)
       }
     }
   }
@@ -158,13 +177,41 @@ const App = () => {
       const blogUser = { ...user, id: createdBlog.user }
       createdBlog.user = blogUser
       dispatch(addBlog(createdBlog))
+
+      const modifiedUser = users.find((user) => user.id === blogUser.id)
+      const newBlogs = modifiedUser.blogs.concat(createdBlog)
+      dispatch(
+        setAllUsers(
+          users.map((user) =>
+            user.id === modifiedUser.id
+              ? { ...modifiedUser, blogs: newBlogs }
+              : user
+          )
+        )
+      )
+
       showSuccessNotification(
         `A new blog ${createdBlog.title} by ${createdBlog.author} added`
       )
       blogFormRef.current.toggleVisibility()
       return true
     } catch (exception) {
-      showError(exception)
+      showError(exception.message)
+      return false
+    }
+  }
+
+  const addComment = async (blog, comment) => {
+    try {
+      const updatedBlog = await blogService.addComment(blog.id, comment)
+      updatedBlog.user = blog.user
+      const newBlogList = blogs
+        .filter((blog) => blog.id !== updatedBlog.id)
+        .concat(updatedBlog)
+      dispatch(setBlogs(newBlogList))
+      return true
+    } catch (exception) {
+      showError(exception.message)
       return false
     }
   }
@@ -195,6 +242,7 @@ const App = () => {
                   user={user}
                   updateBlog={updateBlog}
                   deleteBlog={deleteBlog}
+                  addComment={addComment}
                 />
               ) : (
                 <Navigate replace to='/' />

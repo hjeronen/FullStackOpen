@@ -40,6 +40,16 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
             <div></div>
           )}
         </div>
+        <h3>Comments</h3>
+        {blog.comments.length > 0 ? (
+          <ul>
+            {blog.comments.map((comment, i) => (
+              <li key={i}>{comment}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No comments yet.</p>
+        )}
       </div>
     </div>
   )

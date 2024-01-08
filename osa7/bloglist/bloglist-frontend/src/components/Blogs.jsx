@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
+import BlogForm from './BlogForm'
+import Togglable from './Togglable'
 
-const Blogs = ({ blogs }) => {
+const Blogs = ({ blogs, addNewBlog, blogFormRef }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -15,6 +17,9 @@ const Blogs = ({ blogs }) => {
 
   return (
     <div>
+      <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
+        <BlogForm createBlog={addNewBlog} />
+      </Togglable>
       {blogs
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (

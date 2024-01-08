@@ -9,8 +9,7 @@ import { setBlogs, addBlog } from './reducers/blogReducer'
 import { setUser, setAllUsers, removeUser } from './reducers/userReducer'
 import Blog from './components/Blog'
 import Blogs from './components/Blogs'
-import BlogForm from './components/BlogForm'
-import Togglable from './components/Togglable'
+import Navbar from './components/Navbar'
 import Notification from './components/Notification'
 import Users from './components/Users'
 import User from './components/User'
@@ -170,29 +169,23 @@ const App = () => {
     }
   }
 
-  const renderUser = () => {
-    return (
-      <div>
-        <div>
-          {user.name} logged in
-          <button onClick={handleLogout}>logout</button>
-        </div>
-        <br />
-        <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
-          <BlogForm createBlog={addNewBlog} />
-        </Togglable>
-      </div>
-    )
-  }
-
   return (
     <div>
+      {user && <Navbar user={user} handleLogout={handleLogout} />}
       <h2>Bloglist</h2>
       <Notification type={notification.type} message={notification.message} />
-      {user ? renderUser() : loginForm()}
-      {user && (
+      {user ? (
         <Routes>
-          <Route path='/' element={<Blogs blogs={blogs} />} />
+          <Route
+            path='/'
+            element={
+              <Blogs
+                blogs={blogs}
+                addNewBlog={addNewBlog}
+                blogFormRef={blogFormRef}
+              />
+            }
+          />
           <Route
             path={'/blogs/:id'}
             element={
@@ -214,6 +207,8 @@ const App = () => {
             element={<User user={showUser} blogs={blogs} />}
           />
         </Routes>
+      ) : (
+        loginForm()
       )}
     </div>
   )

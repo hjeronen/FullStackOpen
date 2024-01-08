@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Navigate, Routes, Route, useMatch } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   setNotification,
@@ -7,6 +7,7 @@ import {
 } from './reducers/notificationReducer'
 import { setBlogs, addBlog } from './reducers/blogReducer'
 import { setUser, setAllUsers, removeUser } from './reducers/userReducer'
+import Blog from './components/Blog'
 import Blogs from './components/Blogs'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
@@ -27,6 +28,16 @@ const App = () => {
   const blogs = [...useSelector((state) => state.blogs)]
   const user = useSelector((state) => state.users.current)
   const users = useSelector((state) => state.users.all)
+
+  const blogMatch = useMatch('/blogs/:id')
+  const showBlog = blogMatch
+    ? blogs.find((blog) => blog.id === blogMatch.params.id)
+    : null
+
+  const userMatch = useMatch('/users/:id')
+  const showUser = userMatch
+    ? users.find((user) => user.id === userMatch.params.id)
+    : null
 
   useEffect(() => {
     blogService.getAll().then((blogs) => dispatch(setBlogs(blogs)))
@@ -175,31 +186,36 @@ const App = () => {
   }
 
   return (
-    <Router>
+    <div>
       <h2>Bloglist</h2>
       <Notification type={notification.type} message={notification.message} />
       {user ? renderUser() : loginForm()}
       {user && (
         <Routes>
+          <Route path='/' element={<Blogs blogs={blogs} />} />
           <Route
-            path='/'
+            path={'/blogs/:id'}
             element={
-              <Blogs
-                user={user}
-                blogs={blogs}
-                updateBlog={updateBlog}
-                deleteBlog={deleteBlog}
-              />
+              showBlog ? (
+                <Blog
+                  blog={showBlog}
+                  user={user}
+                  updateBlog={updateBlog}
+                  deleteBlog={deleteBlog}
+                />
+              ) : (
+                <Navigate replace to='/' />
+              )
             }
           />
           <Route path='/users' element={<Users users={users} />} />
           <Route
             path='/users/:id'
-            element={<User users={users} blogs={blogs} />}
+            element={<User user={showUser} blogs={blogs} />}
           />
         </Routes>
       )}
-    </Router>
+    </div>
   )
 }
 

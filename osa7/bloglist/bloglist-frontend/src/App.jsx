@@ -1,19 +1,21 @@
 import { useState, useEffect, useRef } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   setNotification,
   clearNotification,
 } from './reducers/notificationReducer'
 import { setBlogs, addBlog } from './reducers/blogReducer'
-import { setUser, removeUser } from './reducers/userReducer'
+import { setUser, setAllUsers, removeUser } from './reducers/userReducer'
 import Blogs from './components/Blogs'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 import Users from './components/Users'
+import User from './components/User'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import userService from './services/users'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -23,10 +25,15 @@ const App = () => {
   const dispatch = useDispatch()
   const notification = useSelector((state) => state.notification)
   const blogs = [...useSelector((state) => state.blogs)]
-  const user = useSelector((state) => state.user)
+  const user = useSelector((state) => state.users.current)
+  const users = useSelector((state) => state.users.all)
 
   useEffect(() => {
     blogService.getAll().then((blogs) => dispatch(setBlogs(blogs)))
+  }, [])
+
+  useEffect(() => {
+    userService.getAll().then((users) => dispatch(setAllUsers(users)))
   }, [])
 
   useEffect(() => {
@@ -185,7 +192,11 @@ const App = () => {
               />
             }
           />
-          <Route path='/users' element={<Users />} />
+          <Route path='/users' element={<Users users={users} />} />
+          <Route
+            path='/users/:id'
+            element={<User users={users} blogs={blogs} />}
+          />
         </Routes>
       )}
     </Router>

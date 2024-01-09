@@ -1,5 +1,14 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  ListGroup,
+  Row,
+} from 'react-bootstrap'
 
 const Blog = ({ blog, updateBlog, deleteBlog, user, addComment }) => {
   const [comment, setComment] = useState('')
@@ -27,50 +36,68 @@ const Blog = ({ blog, updateBlog, deleteBlog, user, addComment }) => {
 
   return (
     <div className='blog'>
-      <h2>
-        {blog.title} {blog.author}
-      </h2>
-      <div>
-        <a href={blog.url}>{blog.url}</a>
-        <div>
-          {blog.likes} likes
-          <button onClick={like}>like</button>
-        </div>
-        <div>Added by {blog.user.name}</div>
-        <div>
+      <Card>
+        <Card.Header as='h3'>{blog.title}</Card.Header>
+        <ListGroup className='list-group-flush list-group'>
+          <ListGroup.Item>
+            <Card.Title as='h5'>by {blog.author}</Card.Title>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <a href={blog.url}>{blog.url}</a>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            {blog.likes} likes
+            <Button className='button-extra extra-space-left' onClick={like}>
+              Like
+            </Button>
+          </ListGroup.Item>
+          <ListGroup.Item>Added by {blog.user.name}</ListGroup.Item>
           {blog.user.username === user.username ? (
-            <button
-              id='deleteButton'
-              style={{ backgroundColor: '#349feb' }}
-              onClick={() => deleteBlog(blog)}
-            >
-              delete
-            </button>
+            <ListGroup.Item>
+              <Button
+                id='deleteButton'
+                className='button-cancel'
+                onClick={() => deleteBlog(blog)}
+              >
+                Delete
+              </Button>
+            </ListGroup.Item>
           ) : (
             <div></div>
           )}
-        </div>
-        <h3>Comments</h3>
-        <form onSubmit={postComment}>
-          <input
-            type='text'
-            value={comment}
-            name='Comment'
-            id='comment'
-            onChange={({ target }) => setComment(target.value)}
-          />
-          <button type='submit'>add comment</button>
-        </form>
-        {blog.comments.length > 0 ? (
-          <ul>
-            {blog.comments.map((comment, i) => (
-              <li key={i}>{comment}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No comments yet.</p>
-        )}
-      </div>
+        </ListGroup>
+        <Card.Header as='h4' className='card-subtitle'>
+          Comments
+        </Card.Header>
+        <Container className='content-container'>
+          <Form onSubmit={postComment} className='form'>
+            <Form.Group className='form-group'>
+              <Form.Label>Add your comment:</Form.Label>
+              <Form.Control
+                type='text'
+                value={comment}
+                name='Comment'
+                id='comment'
+                onChange={({ target }) => setComment(target.value)}
+              />
+            </Form.Group>
+            <Form.Group className='form-group'>
+              <Button type='submit' className='button-extra'>
+                Add comment
+              </Button>
+            </Form.Group>
+          </Form>
+          <ListGroup>
+            {blog.comments.length > 0 ? (
+              blog.comments.map((comment, i) => (
+                <ListGroup.Item key={i}>{comment}</ListGroup.Item>
+              ))
+            ) : (
+              <ListGroup.Item>No comments yet.</ListGroup.Item>
+            )}
+          </ListGroup>
+        </Container>
+      </Card>
     </div>
   )
 }

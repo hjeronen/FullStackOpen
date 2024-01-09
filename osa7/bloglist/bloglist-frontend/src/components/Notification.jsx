@@ -1,26 +1,7 @@
 import PropTypes from 'prop-types'
+import { Alert } from 'react-bootstrap'
 
 const Notification = ({ type, message }) => {
-  const success = {
-    color: 'green',
-    background: 'lightgrey',
-    fontSize: 20,
-    borderStyle: 'solid',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-  }
-
-  const error = {
-    color: 'red',
-    background: 'lightgrey',
-    fontSize: 20,
-    borderStyle: 'solid',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-  }
-
   if (!message) {
     return null
   }
@@ -30,9 +11,9 @@ const Notification = ({ type, message }) => {
   }
 
   return (
-    <div id={type} style={type === 'success' ? success : error}>
+    <Alert id={type} variant={type === 'success' ? 'success' : 'danger'}>
       {message}
-    </div>
+    </Alert>
   )
 }
 

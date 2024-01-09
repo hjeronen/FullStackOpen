@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Button, Container, Form } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 
 const BlogForm = ({ createBlog }) => {
@@ -24,42 +25,46 @@ const BlogForm = ({ createBlog }) => {
   }
 
   return (
-    <form onSubmit={createNewBlog}>
-      <h2>Create new blog</h2>
-      <div>
-        title:
-        <input
-          type='text'
-          value={title}
-          name='Title'
-          id='title'
-          onChange={({ target }) => setTitle(target.value)}
-        />
-      </div>
-      <div>
-        author:
-        <input
-          type='text'
-          value={author}
-          name='Author'
-          id='author'
-          onChange={({ target }) => setAuthor(target.value)}
-        />
-      </div>
-      <div>
-        url:
-        <input
-          type='text'
-          value={url}
-          name='Url'
-          id='url'
-          onChange={({ target }) => setUrl(target.value)}
-        />
-      </div>
-      <button id='createButton' type='submit'>
-        create
-      </button>
-    </form>
+    <Container className='content-container'>
+      <Form onSubmit={createNewBlog} className='form'>
+        <h2>Create new blog</h2>
+        <Form.Group className='form-group'>
+          <Form.Label>Title:</Form.Label>
+          <Form.Control
+            type='text'
+            value={title}
+            name='Title'
+            id='title'
+            onChange={({ target }) => setTitle(target.value)}
+          />
+        </Form.Group>
+        <Form.Group className='form-group'>
+          <Form.Label>Author:</Form.Label>
+          <Form.Control
+            type='text'
+            value={author}
+            name='Author'
+            id='author'
+            onChange={({ target }) => setAuthor(target.value)}
+          />
+        </Form.Group>
+        <Form.Group className='form-group'>
+          <Form.Label>Url:</Form.Label>
+          <Form.Control
+            type='text'
+            value={url}
+            name='Url'
+            id='url'
+            onChange={({ target }) => setUrl(target.value)}
+          />
+        </Form.Group>
+        <Container className='button-container'>
+          <Button id='createButton' type='submit'>
+            Create
+          </Button>
+        </Container>
+      </Form>
+    </Container>
   )
 }
 

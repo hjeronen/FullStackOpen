@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Navigate, Routes, Route, useMatch } from 'react-router-dom'
+import { Container } from 'react-bootstrap'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   setNotification,
@@ -9,13 +10,15 @@ import { setBlogs, addBlog } from './reducers/blogReducer'
 import { setUser, setAllUsers, removeUser } from './reducers/userReducer'
 import Blog from './components/Blog'
 import Blogs from './components/Blogs'
-import Navbar from './components/Navbar'
+import LoginForm from './components/LoginForm'
+import Navigation from './components/Navigation'
 import Notification from './components/Notification'
 import Users from './components/Users'
 import User from './components/User'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import userService from './services/users'
+import './styles.css'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -217,9 +220,8 @@ const App = () => {
   }
 
   return (
-    <div>
-      {user && <Navbar user={user} handleLogout={handleLogout} />}
-      <h2>Bloglist</h2>
+    <div className='container'>
+      <Navigation user={user} handleLogout={handleLogout} />
       <Notification type={notification.type} message={notification.message} />
       {user ? (
         <Routes>
@@ -256,7 +258,15 @@ const App = () => {
           />
         </Routes>
       ) : (
-        loginForm()
+        <Container className='content-container'>
+          <LoginForm
+            handleLogin={handleLogin}
+            username={username}
+            setUsername={setUsername}
+            password={password}
+            setPassword={setPassword}
+          />
+        </Container>
       )}
     </div>
   )
